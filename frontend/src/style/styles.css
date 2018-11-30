@@ -1,0 +1,113 @@
+.divBorder {
+  flex-direction: column;
+  align-items: center;
+}
+
+.divPosts {
+  justify-items: center;
+}
+
+.btnNavBar {
+  background-color: #008cba;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.btnNavBarGreen {
+  background-color: #4caf50;
+}
+.btnSelected {
+  border: solid;
+  border-color: #32cd32;
+  border-width: 5px;
+}
+
+.navBar {
+  background-color: #000080;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.divPostsDetails {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  -webkit-align-items: center;
+  align-items: center;
+}
+.postCard {
+  background-color: #87cefa;
+  width: 600px;
+}
+.postTitle {
+  background-color: #00bfff;
+}
+.postFooter {
+  display: flex;
+  background-color: #4169e1;
+  align-items: center;
+  flex-direction: row;
+}
+.postSub {
+  display: flex;
+  flex-direction: row;
+}
+.br {
+  background-color: transparent;
+}
+.textLeft {
+  width: 50%;
+  text-align: left;
+  padding-left: 10px;
+}
+.textRight {
+  width: 50%;
+  text-align: right;
+  padding-right: 10px;
+}
+.subNav {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background-color: #f6f6f6;
+}
+.postComments {
+  //border: solid;
+  border-width: 3px;
+  border-color: #000;
+}
+.postComment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: solid;
+  border-width: 2px;
+  border-color: #d3d3d3;
+  height: auto;
+}
+.postCommentAuthor {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+}
+.balao {
+  background: #d3d3d3;
+  border-radius: 30px 30px 30px 30px;
+  width: 300px;
+  height: auto;
+  margin-bottom: 1em;
+}
+.newComment {
+  display: flex;
+  flex-direction: row;
+  background-color: #f6f6f6;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
