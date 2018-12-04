@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import * as Api from "../utils/api";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
 import "../style/styles.css";
+import UUID from "./UUID";
+import { callRecordPost, callGetOnePostByEdit } from "../actions";
 
-export default class NewPost extends Component {
-  //virou entity
+export class NewPost extends Component {
   state = {
     id: "",
     timestamp: "",
@@ -12,56 +13,33 @@ export default class NewPost extends Component {
     body: "",
     author: "",
     category: "",
-    voteScore: "",
-    deleted: "",
-    commentCount: "",
-    idEditPost: "",
     newPostCat: "react"
   };
 
-  async loadPostById(id) {
-    const post = await Api.getPostById(id).then(response => response);
-    typeof post !== "undefined" &&
-      this.setState({
-        id: post.id,
-        timestamp: post.timestamp,
-        title: post.title,
-        body: post.body,
-        author: post.author,
-        category: post.category,
-        voteScore: post.voteScore,
-        deleted: post.deleted,
-        commentCount: post.commentCount
-      });
-  }
-  async componentDidMount() {
-    const id = new URLSearchParams(window.location.search).get("id"); // bar
-    this.setState({ idEditPost: id });
-    id && (await this.loadPostById(id));
+  componentDidMount() {
+    const id = new URLSearchParams(window.location.search).get("id");
+    id && this.props.callGetOnePostByEdit(id);
   }
   async recordPost() {
-    let date = new Date();
+    const key = UUID();
 
     let post = {
-      id:
-        this.state.author +
-        date.getFullYear() +
-        "" +
-        date.getMonth() +
-        "" +
-        date.getDay(),
-      timestamp: date.getFullYear() + "" + date.getMonth() + "" + date.getDay(),
+      id: key,
+      timestamp: Date.now(),
       title: this.state.title,
       body: this.state.body,
       author: this.state.author,
-      category: this.props.newPostCat
+      category: this.state.newPostCat
     };
 
-    this.props._handleRecordPost(post);
-    this.setState({ title: "", body: "" });
+    this.props.callRecordPost(post);
+
+    window.location.href = "/";
   }
 
   render() {
+    let post = this.props.posting.posting ? this.props.posting.posting : [];
+
     return (
       <div>
         <div className="subNav">
@@ -89,11 +67,11 @@ export default class NewPost extends Component {
             </Link>
           </div>
         </div>
-        {this.state.idEditPost ? <p>Edit Post</p> : <p>New Post</p>}
+        {post.id !== undefined ? <p>Edit Post</p> : <p>New Post</p>}
         <input
           type="text"
           placeholder="Author"
-          value={this.state.author}
+          defaultValue={post.author !== undefined ? post.author : ""}
           onChange={evt =>
             this.setState({
               author: evt.target.value
@@ -104,7 +82,7 @@ export default class NewPost extends Component {
         <input
           type="text"
           placeholder="Title"
-          value={this.state.title}
+          defaultValue={post.title !== undefined ? post.title : ""}
           onChange={evt =>
             this.setState({
               title: evt.target.value
@@ -115,7 +93,7 @@ export default class NewPost extends Component {
         <input
           type="text"
           placeholder="Post..."
-          value={this.state.body}
+          defaultValue={post.body !== undefined ? post.body : ""}
           onChange={evt =>
             this.setState({
               body: evt.target.value
@@ -128,3 +106,10 @@ export default class NewPost extends Component {
     );
   }
 }
+
+const mapStateToProps = ({ posting }) => ({ posting });
+
+export default connect(
+  mapStateToProps,
+  { callRecordPost, callGetOnePostByEdit }
+)(NewPost);

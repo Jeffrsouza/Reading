@@ -19,7 +19,7 @@ export const getAllCat = () =>
 
 export const localToken = () => token;
 
-export const newPost = post => {
+export const newPost = post =>
   fetch(`${api}/posts`, {
     method: "POST",
     headers: { ...headers, "Content-Type": "application/json" },
@@ -27,7 +27,6 @@ export const newPost = post => {
   })
     .then(response => console.log(response))
     .catch(err => console.log(err));
-};
 
 export const getAllPost = () =>
   fetch(`${api}/posts`, { headers })
@@ -36,6 +35,11 @@ export const getAllPost = () =>
 
 export const getOnePost = filter =>
   fetch(`${api}/${filter}/posts`, { headers })
+    .then(response => response.json())
+    .then(response => response);
+
+export const getOnePostById = id =>
+  fetch(`${api}/posts/${id}`, { headers })
     .then(response => response.json())
     .then(response => response);
 

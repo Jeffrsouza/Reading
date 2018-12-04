@@ -1,39 +1,27 @@
-// deve mostrar os detalhes da postagem, incluindo: título,
-//    corpo, autor, data de criação em formato legível pelo
-//    usuário e pontuação dos votos
-
-// deve listar todos os comentários daquela postagem,
-//    ordenados por voteScore (começando pelo mais alto)
-
-// deve ter controles para editar ou remover a postagem
-
-// deve ter um controle para adicionar um novo comentário
-
-// implemente o formulário de comentários da forma que quiser (em linha, modal, etc.)
-
-// os comentários também devem ter controles para edição ou exclusão
-
 import React, { Component } from "react";
 import "../style/styles.css";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import {
-  loadPosting,
   callLoadPosting,
   callDeletePosting,
   callVotePosting,
-  loadComment,
   callLoadComment,
   callNewComment,
-  loadPostingByCat,
-  callLoadPostingByCat
+  callLoadCategories,
+  callFilterCategories,
+  callOrderPosting,
+  callEditComment,
+  callVoteComment,
+  callDeleteComment
 } from "../actions";
 import UUID from "./UUID";
 
 export class PostDetails extends Component {
   state = {
     openComments: "",
-    commentEdit: ""
+    commentEdit: "",
+    order: ""
   };
 
   handleDeletePosting = id => {
@@ -42,7 +30,7 @@ export class PostDetails extends Component {
 
   handleVotingPost = (id, option) => {
     const vote = { option: option };
-    this.props.callVotePosting(id, vote);
+    this.props.callVotePosting(id, vote, this.state.order);
   };
 
   handleNewComent = (body, author, id) => {
@@ -58,108 +46,165 @@ export class PostDetails extends Component {
   };
 
   handleFilter = filter => {
-    this.props.controllFilter(filter);
+    this.props.callFilterCategories(filter);
   };
 
-  editComment(body, id) {
-    this.props.handleNewComent(body, id);
+  hnadleOpenComment = () => {
+    this.props.callLoadComment();
+  };
+
+  orderPosts = evt => {
+    this.setState({ order: evt });
+    this.props.callOrderPosting(evt);
+  };
+
+  handleEditComment = (id, body) => {
+    let post = {
+      timestamp: new Date().getFullYear(),
+      body: body
+    };
+    this.props.callEditComment(id, post);
     this.setState({ commentEdit: "" });
+  };
+
+  async handleVotingComment(id, vot) {
+    let vote = {
+      option: vot
+    };
+    await this.props.callVoteComment(id, vote);
   }
 
+  formatDate = date => {
+    const postDate = new Date(date);
+    const year = postDate.getFullYear();
+    const month =
+      postDate.getMonth() < 10
+        ? "0" + (postDate.getMonth() + 1)
+        : postDate.getMonth() + 1;
+    const day =
+      postDate.getDay() < 10 ? "0" + postDate.getDay() : postDate.getDay();
+    return year + "/" + month + "/" + day;
+  };
+
+  handleDeleteComment = id => {
+    this.props.callDeleteComment(id);
+  };
+
+  navBar = (cat, filter) => {
+    return (
+      <input
+        key={cat.name}
+        className={filter === cat.name ? "btnNavBar btnSelected" : "btnNavBar"}
+        type="button"
+        value={cat.name}
+        onClick={evt => this.handleFilter(evt.target.value)}
+      />
+    );
+  };
   listPost = post => {
     return (
-      <div key={post.id}>
-        <div className="postCard">
-          <div className="postTitle">
-            <h1>{post.title}</h1>
+      <div>
+        {post !== undefined ? (
+          <div key={post.id}>
+            <div className="postCard">
+              <div className="postTitle">
+                <h1>{post.title}</h1>
+              </div>
+              <div className="postSub">
+                <div className="textLeft" />
+                <div className="textRight">
+                  <Link
+                    to={{
+                      pathname: "/newPost",
+                      search: "?id=" + post.id
+                    }}
+                  >
+                    <input
+                      type="button"
+                      value="Edit"
+                      onClick={() => console.log("Edit")}
+                    />
+                  </Link>
+                  <input
+                    type="button"
+                    value="Delete"
+                    onClick={() => this.handleDeletePosting(post.id)}
+                  />
+                </div>
+              </div>
+              <div className="postSub">
+                <div className="textLeft">
+                  <p>{"Author: " + post.author}</p>
+                  <p>{"Category: " + post.category}</p>
+                </div>
+                <div className="textRight">
+                  <p>{"Date: " + this.formatDate(post.timestamp)}</p>
+                </div>
+              </div>
+              <div className="postBody">
+                <h2>{post.body}</h2>
+              </div>
+              <div className="postFooter">
+                <div className="textLeft">
+                  <p>
+                    {"Score: " + post.voteScore}
+                    &nbsp; &nbsp;
+                    <input
+                      type="button"
+                      value="-"
+                      onClick={() => this.handleVotingPost(post.id, "downVote")}
+                    />
+                    <input
+                      type="button"
+                      value="+"
+                      onClick={() => this.handleVotingPost(post.id, "upVote")}
+                    />
+                  </p>
+                </div>
+                <div className="textRight">
+                  <p>{"Coments: " + post.commentCount}</p>
+                </div>
+              </div>
+              <div className="newComment">
+                <div className="textLeft">
+                  <input
+                    type="text"
+                    name={"author" + post.id}
+                    placeholder="Author"
+                  />
+                </div>
+                <div className="textLeft">
+                  <input
+                    type="text"
+                    name={"body" + post.id}
+                    placeholder="Comment"
+                  />
+                </div>
+                <div className="textRight">
+                  <input
+                    type="button"
+                    value="Post"
+                    onClick={() => {
+                      this.handleNewComent(
+                        document.getElementsByName("body" + post.id)[0].value,
+                        document.getElementsByName("author" + post.id)[0].value,
+                        post.id
+                      );
+                      document.getElementsByName("body" + post.id)[0].value =
+                        "";
+                      document.getElementsByName("author" + post.id)[0].value =
+                        "";
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="postComments">{this.comentsPost(post.id)}</div>
+            </div>
+            <div className="br" />
           </div>
-          <div className="postSub">
-            <div className="textLeft" />
-            <div className="textRight">
-              <Link
-                to={{
-                  pathname: "/newPost",
-                  search: "?id=" + post.id
-                }}
-              >
-                <input
-                  type="button"
-                  value="Edit"
-                  onClick={() => console.log("Edit")}
-                />
-              </Link>
-              <input
-                type="button"
-                value="Delete"
-                onClick={() => this.handleDeletePosting(post.id)}
-              />
-            </div>
-          </div>
-          <div className="postSub">
-            <div className="textLeft">
-              <p>{"Author: " + post.author}</p>
-              <p>{"Category: " + post.category}</p>
-            </div>
-            <div className="textRight">
-              <p>{"Date: " + post.timestamp}</p>
-            </div>
-          </div>
-          <div className="postBody">
-            <h2>{post.body}</h2>
-          </div>
-          <div className="postFooter">
-            <div className="textLeft">
-              <p>
-                {"Score: " + post.voteScore}
-                &nbsp; &nbsp;
-                <input
-                  type="button"
-                  value="-"
-                  onClick={() => this.handleVotingPost(post.id, "downVote")}
-                />
-                <input
-                  type="button"
-                  value="+"
-                  onClick={() => this.handleVotingPost(post.id, "upVote")}
-                />
-              </p>
-            </div>
-            <div className="textRight">
-              <p>{"Coments: " + post.commentCount}</p>
-            </div>
-          </div>
-          <div className="newComment">
-            <div className="textLeft">
-              <input
-                type="text"
-                name={"author" + post.id}
-                placeholder="Author"
-              />
-            </div>
-            <div className="textLeft">
-              <input
-                type="text"
-                name={"body" + post.id}
-                placeholder="Comment"
-              />
-            </div>
-            <div className="textRight">
-              <input
-                type="button"
-                value="Post"
-                onClick={() =>
-                  this.handleNewComent(
-                    document.getElementsByName("body" + post.id)[0].value,
-                    document.getElementsByName("author" + post.id)[0].value,
-                    post.id
-                  )
-                }
-              />
-            </div>
-          </div>
-          <div className="postComments">{this.comentsPost(post.id)}</div>
-        </div>
-        <div className="br" />
+        ) : (
+          <p>Sem dados</p>
+        )}
       </div>
     );
   };
@@ -180,7 +225,7 @@ export class PostDetails extends Component {
                   <p>{"Author: " + com.author}</p>
                 </div>
                 <div className="textRight">
-                  <p>{"Data: " + com.timestamp}</p>
+                  <p>{"Data: " + this.formatDate(com.timestamp)}</p>
                 </div>
               </div>
               <div className="balao">
@@ -195,15 +240,13 @@ export class PostDetails extends Component {
                       type="button"
                       value="-"
                       onClick={() =>
-                        this.props._handleVotingComment(com.id, "downVote")
+                        this.handleVotingComment(com.id, "downVote")
                       }
                     />
                     <input
                       type="button"
                       value="+"
-                      onClick={() =>
-                        this.props._handleVotingComment(com.id, "upVote")
-                      }
+                      onClick={() => this.handleVotingComment(com.id, "upVote")}
                     />
                   </p>
                 </div>
@@ -216,7 +259,7 @@ export class PostDetails extends Component {
                   <input
                     type="button"
                     value="Delete"
-                    onClick={() => this.props._handleDeleteComment(com.id)}
+                    onClick={() => this.handleDeleteComment(com.id)}
                   />
                 </div>
               </div>
@@ -234,12 +277,14 @@ export class PostDetails extends Component {
                     <input
                       type="button"
                       value="Post"
-                      onClick={() =>
-                        this.editComment(
-                          document.getElementsByName("body" + com.id)[0].value,
-                          com.id
-                        )
-                      }
+                      onClick={() => {
+                        this.handleEditComment(
+                          com.id,
+                          document.getElementsByName("body" + com.id)[0].value
+                        );
+                        document.getElementsByName("body" + com.id)[0].value =
+                          "";
+                      }}
                     />
                     <input
                       type="button"
@@ -267,11 +312,16 @@ export class PostDetails extends Component {
 
   async componentDidMount() {
     this.props.callLoadPosting();
+    this.props.callLoadCategories();
+    this.handleFilter();
   }
   render() {
     let category = [];
     let filter = this.props.filter.filter;
+    let categories = this.props.categories.categories;
     let posts = this.props.posts.posts;
+    console.log("Print" + this.props.posts.posts);
+
     return (
       <div>
         <div className="subNav">
@@ -300,24 +350,26 @@ export class PostDetails extends Component {
             <input
               key={"all"}
               className={
-                this.state.filter === "all"
-                  ? "btnNavBar btnSelected"
-                  : "btnNavBar"
+                filter === "all" ? "btnNavBar btnSelected" : "btnNavBar"
               }
               type="button"
               value={"all"}
-              onClick={evt => this.filterCategory(evt.target.value)}
+              onClick={evt => this.handleFilter(evt.target.value)}
             />
-            {category && category.map(cat => this.navBar(cat))}
+            {categories && categories.map(cat => this.navBar(cat, filter))}
           </div>
         </div>
         <div className="divPostsDetails">
           <h1>{filter === "all" ? "All Categories" : "Category: " + filter}</h1>
-          {typeof posts !== "undefined" && posts.length ? (
+          {posts !== undefined && posts.length ? (
             filter !== "all" ? (
-              posts
-                .filter(post => post.category === filter)
-                .map(post => this.listPost(post))
+              posts.filter(post => post.category === filter).length ? (
+                posts
+                  .filter(post => post.category === filter)
+                  .map(post => this.listPost(post))
+              ) : (
+                <h1>Sem dados</h1>
+              )
             ) : (
               posts.map(post => this.listPost(post))
             )
@@ -330,10 +382,18 @@ export class PostDetails extends Component {
   }
 }
 
-const mapStateToProps = ({ posts, comments, filter }) => ({
+const mapStateToProps = ({
   posts,
   comments,
-  filter
+  categories,
+  filter,
+  openComments
+}) => ({
+  posts,
+  comments,
+  categories,
+  filter,
+  openComments
 });
 
 export default connect(
@@ -343,6 +403,12 @@ export default connect(
     callDeletePosting,
     callVotePosting,
     callNewComment,
-    callLoadComment
+    callLoadComment,
+    callLoadCategories,
+    callFilterCategories,
+    callOrderPosting,
+    callEditComment,
+    callVoteComment,
+    callDeleteComment
   }
 )(PostDetails);
