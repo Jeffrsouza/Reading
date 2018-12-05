@@ -1,6 +1,7 @@
 import * as Api from "../utils/api";
 
 export const RECORD_POSTING = "RECORD_POSTING";
+export const EDIT_POSTING = "RECORD_POSTING";
 export const ORDER_POSTING = "ORDER_POSTING";
 export const LOAD_POSTING = "LOAD_POSTSING";
 export const LOAD_POSTING_BY_CAT = "LOAD_POSTING_BY_CAT";
@@ -93,6 +94,18 @@ export function callGetOnePostByEdit(id) {
 export function getOnePostByEdit(data) {
   return {
     type: ONE_POSTING,
+    data
+  };
+}
+
+export function callEditPost(post, id) {
+  return dispatch => {
+    Api.editPost(post, id).then(response => dispatch(editPost(response)));
+  };
+}
+export function editPost(data) {
+  return {
+    type: EDIT_POSTING,
     data
   };
 }

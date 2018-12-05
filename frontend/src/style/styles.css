@@ -35,6 +35,11 @@
   align-items: center;
 }
 
+.navBarInter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 .divPostsDetails {
   text-align: center;
   display: flex;

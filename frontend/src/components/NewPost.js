@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import "../style/styles.css";
 import UUID from "./UUID";
-import { callRecordPost, callGetOnePostByEdit } from "../actions";
+import { callRecordPost, callGetOnePostByEdit, callEditPost } from "../actions";
 
 export class NewPost extends Component {
   state = {
@@ -13,32 +13,48 @@ export class NewPost extends Component {
     body: "",
     author: "",
     category: "",
-    newPostCat: "react"
+    newPostCat: "react",
+    edit: false
   };
 
   componentDidMount() {
     const id = new URLSearchParams(window.location.search).get("id");
-    id && this.props.callGetOnePostByEdit(id);
+    id !== null
+      ? this.props.callGetOnePostByEdit(id)
+      : this.props.callGetOnePostByEdit("");
+    this.setState({ edit: id !== null ? true : false });
   }
-  async recordPost() {
+  async recordPost(id = undefined) {
     const key = UUID();
-
-    let post = {
-      id: key,
-      timestamp: Date.now(),
-      title: this.state.title,
-      body: this.state.body,
-      author: this.state.author,
-      category: this.state.newPostCat
-    };
-
-    this.props.callRecordPost(post);
+    if (id) {
+      let post = {
+        title: this.state.title,
+        body: this.state.body
+      };
+      this.props.callEditPost(post, id);
+    } else {
+      let post = {
+        id: key,
+        timestamp: Date.now(),
+        title: this.state.title,
+        body: this.state.body,
+        author: this.state.author,
+        category: this.state.newPostCat
+      };
+      this.props.callRecordPost(post);
+    }
 
     window.location.href = "/";
   }
 
   render() {
-    let post = this.props.posting.posting ? this.props.posting.posting : [];
+    let { edit } = this.state;
+    let post =
+      this.state.id !== null
+        ? this.props.posting.posting
+          ? this.props.posting.posting
+          : ""
+        : "";
 
     return (
       <div>
@@ -48,7 +64,7 @@ export class NewPost extends Component {
             <select
               className="btnNavBar"
               onChange={evt => this.setState({ newPostCat: evt.target.value })}
-              defaultValue={this.state.newPostCat}
+              defaultValue={edit && post.category}
             >
               <option className="btnNavBar" value="react">
                 react
@@ -67,22 +83,18 @@ export class NewPost extends Component {
             </Link>
           </div>
         </div>
-        {post.id !== undefined ? <p>Edit Post</p> : <p>New Post</p>}
+        {edit ? <p>Edit Post</p> : <p>New Post</p>}
         <input
           type="text"
           placeholder="Author"
-          defaultValue={post.author !== undefined ? post.author : ""}
-          onChange={evt =>
-            this.setState({
-              author: evt.target.value
-            })
-          }
+          disabled={edit}
+          defaultValue={edit ? post.author : ""}
         />
         <br />
         <input
           type="text"
           placeholder="Title"
-          defaultValue={post.title !== undefined ? post.title : ""}
+          defaultValue={edit ? post.title : ""}
           onChange={evt =>
             this.setState({
               title: evt.target.value
@@ -93,7 +105,7 @@ export class NewPost extends Component {
         <input
           type="text"
           placeholder="Post..."
-          defaultValue={post.body !== undefined ? post.body : ""}
+          defaultValue={edit ? post.body : ""}
           onChange={evt =>
             this.setState({
               body: evt.target.value
@@ -101,7 +113,11 @@ export class NewPost extends Component {
           }
         />
         <br />
-        <input type="button" value="Send" onClick={() => this.recordPost()} />
+        <input
+          type="button"
+          value="Send"
+          onClick={() => this.recordPost(edit && post.id)}
+        />
       </div>
     );
   }
@@ -111,5 +127,5 @@ const mapStateToProps = ({ posting }) => ({ posting });
 
 export default connect(
   mapStateToProps,
-  { callRecordPost, callGetOnePostByEdit }
+  { callRecordPost, callGetOnePostByEdit, callEditPost }
 )(NewPost);

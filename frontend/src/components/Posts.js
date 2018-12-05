@@ -13,24 +13,20 @@ import {
   callOrderPosting,
   callEditComment,
   callVoteComment,
-  callDeleteComment,
-  callGetOnePostByEdit
+  callDeleteComment
 } from "../actions";
 import UUID from "./UUID";
+import Navbar from "./NavBar";
 
 export class Posts extends Component {
   state = {
     openComments: "",
     commentEdit: "",
-    order: "",
-    category: ""
+    order: ""
   };
 
-  handleDeletePosting = (id, category) => {
-    if (window.confirm("Delete posting?")) {
-      this.props.callDeletePosting(id);
-      window.location = "/" + category;
-    }
+  handleDeletePosting = id => {
+    window.confirm("Delete posting?") && this.props.callDeletePosting(id);
   };
 
   handleVotingPost = (id, option) => {
@@ -94,14 +90,23 @@ export class Posts extends Component {
   listPost = post => {
     return (
       <div>
-        {post.id !== undefined ? (
+        {post !== undefined ? (
           <div key={post.id}>
             <div className="postCard">
               <div className="postTitle">
                 <h1>{post.title}</h1>
               </div>
               <div className="postSub">
-                <div className="textLeft" />
+                <div className="textLeft">
+                  <Link
+                    to={{
+                      pathname: "/" + post.category + "/post_id",
+                      search: "?id=" + post.id + "&category=" + post.category
+                    }}
+                  >
+                    <input type="button" value="Details" />
+                  </Link>
+                </div>
                 <div className="textRight">
                   <Link
                     to={{
@@ -114,9 +119,7 @@ export class Posts extends Component {
                   <input
                     type="button"
                     value="Delete"
-                    onClick={() =>
-                      this.handleDeletePosting(post.id, post.category)
-                    }
+                    onClick={() => this.handleDeletePosting(post.id)}
                   />
                 </div>
               </div>
@@ -191,12 +194,11 @@ export class Posts extends Component {
             <div className="br" />
           </div>
         ) : (
-          (window.location = "/NotFound")
+          <p>Sem dados</p>
         )}
       </div>
     );
   };
-
   comentsPost = id => {
     let { openComments } = this.state;
     openComments === id && this.props.callLoadComment(id);
@@ -299,28 +301,49 @@ export class Posts extends Component {
     );
   };
 
-  componentDidMount() {
-    const id = new URLSearchParams(window.location.search).get("id");
-    const category = new URLSearchParams(window.location.search).get(
-      "category"
-    );
-    this.setState({ category });
-
-    this.props.callGetOnePostByEdit(id);
-  }
-
+  async componentDidMount() {}
   render() {
-    let { category } = this.state;
+    let category = [];
     let filter = this.props.filter.filter;
     let categories = this.props.categories.categories;
-    let posts = this.props.posting.posting;
+    let posts = this.props.posts.posts;
+
     return (
       <div>
+        <div className="subNav">
+          <div className="textLeft">
+            <p className="btnNavBar">Order: </p>
+            <select
+              className="btnNavBar"
+              onChange={evt => this.orderPosts(evt.target.value)}
+            >
+              <option className="btnNavBar" value="voteScore">
+                Vote Score
+              </option>
+              <option className="btnNavBar" value="date">
+                Date
+              </option>
+            </select>
+          </div>
+          <div className="textRight">
+            <Link className="btnNavBar btnNavBarGreen" to="/newPost">
+              New Post
+            </Link>
+          </div>
+        </div>
         <div className="divPostsDetails">
           <h1>
-            {filter === "all" ? "All Categories" : "Category: " + category}
+            {filter === "all"
+              ? "All Categories"
+              : filter === undefined
+              ? "All Categories"
+              : "Category: " + filter}
           </h1>
-          {posts !== undefined ? this.listPost(posts) : <h1>Sem dados</h1>}
+          {posts !== undefined && posts.length ? (
+            posts.map(post => this.listPost(post))
+          ) : (
+            <h1>Sem dados</h1>
+          )}
         </div>
       </div>
     );
@@ -332,15 +355,13 @@ const mapStateToProps = ({
   comments,
   categories,
   filter,
-  openComments,
-  posting
+  openComments
 }) => ({
   posts,
   comments,
   categories,
   filter,
-  openComments,
-  posting
+  openComments
 });
 
 export default connect(
@@ -356,7 +377,6 @@ export default connect(
     callOrderPosting,
     callEditComment,
     callVoteComment,
-    callDeleteComment,
-    callGetOnePostByEdit
+    callDeleteComment
   }
 )(Posts);

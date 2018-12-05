@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import NewPost from "./NewPost";
 import PostDetails from "./PostDetails";
+import Posts from "./Posts";
+import PostsCategory from "./PostsCategory";
 import "../style/styles.css";
-import { Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
+import Navbar from "./NavBar";
+import NotFound from "./NotFound";
 
 export default class Root extends Component {
   state = {};
@@ -11,27 +15,54 @@ export default class Root extends Component {
     return (
       <div className="divBorder">
         <h1>Posts of Reading</h1>
-        <Route
-          exact
-          path="/"
-          render={props => (
-            <div>
-              <div className="divPosts">
-                <PostDetails {...props} />
-              </div>
-            </div>
-          )}
-        />
-        <Route
-          path="/newPost"
-          render={props => (
-            <div>
+        <Switch>
+          <Route exact path="/NotFound" component={NotFound} />
+          <Route
+            path="/newPost"
+            render={props => (
               <div>
-                <NewPost />
+                <div>
+                  <NewPost />
+                </div>
               </div>
-            </div>
-          )}
-        />
+            )}
+          />
+          <Route
+            exact
+            path="/"
+            render={props => (
+              <div>
+                <div className="divPosts">
+                  <Navbar {...props} />
+                  <Posts {...props} />
+                </div>
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path="/:category"
+            render={props => (
+              <div>
+                <div className="divPosts">
+                  <Navbar {...props} />
+                  <Posts {...props} />
+                </div>
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path="/:category/:post_id"
+            render={props => (
+              <div>
+                <div className="divPosts">
+                  <PostDetails {...props} />
+                </div>
+              </div>
+            )}
+          />
+        </Switch>
       </div>
     );
   }

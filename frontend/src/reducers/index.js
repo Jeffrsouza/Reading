@@ -9,6 +9,7 @@ import {
   DELETE_POSTING,
   LOAD_POSTING_BY_CAT,
   ONE_POSTING,
+  EDIT_POSTING,
   //CAT
   FILTER_CATEGORY,
   LOAD_CATEGORIES,
@@ -56,6 +57,13 @@ export function posts(state = initStatePosts, action) {
   switch (action.type) {
     case RECORD_POSTING:
       return { ...state, posts: state.posts.push(action.data) };
+    case EDIT_POSTING:
+      return {
+        ...state,
+        posts: state.posts
+          .filter(p => p.id !== action.data.id)
+          .push(action.data)
+      };
     case ORDER_POSTING:
       return {
         ...state,
