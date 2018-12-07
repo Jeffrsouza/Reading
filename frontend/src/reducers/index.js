@@ -56,7 +56,7 @@ const initStatePosts = {
 export function posts(state = initStatePosts, action) {
   switch (action.type) {
     case RECORD_POSTING:
-      return { ...state, posts: state.posts.push(action.data) };
+      return { ...state, posts: [...state.posts, action.data] };
     case EDIT_POSTING:
       return {
         ...state,
@@ -65,14 +65,15 @@ export function posts(state = initStatePosts, action) {
           .push(action.data)
       };
     case ORDER_POSTING:
+      let alterState = state;
       return {
         ...state,
         posts:
           action.order === "date"
-            ? state.posts.sort((a, b) => {
+            ? alterState.posts.sort((a, b) => {
                 return b.timestamp - a.timestamp;
               })
-            : state.posts.sort((a, b) => {
+            : alterState.posts.sort((a, b) => {
                 return b.voteScore - a.voteScore;
               })
       };
@@ -155,7 +156,7 @@ export function openComments(state = false, action) {
 }
 
 const initStatePosting = {
-  posting: []
+  posting: { voteScore: 0 }
 };
 export function posting(state = posting, action) {
   switch (action.type) {

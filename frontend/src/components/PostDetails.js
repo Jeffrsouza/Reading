@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import {
   callLoadPosting,
   callDeletePosting,
-  callVotePosting,
+  callVotePostingByUnique,
   callLoadComment,
   callNewComment,
   callLoadCategories,
@@ -18,11 +18,9 @@ import {
 } from "../actions";
 import UUID from "./UUID";
 
-export class Posts extends Component {
+export class PostDetails extends Component {
   state = {
     openComments: "",
-    commentEdit: "",
-    order: "",
     category: ""
   };
 
@@ -33,9 +31,9 @@ export class Posts extends Component {
     }
   };
 
-  handleVotingPost = (id, option) => {
+  handleVotingPostUnique = (id, option) => {
     const vote = { option: option };
-    this.props.callVotePosting(id, vote, this.state.order);
+    this.props.callVotePostingByUnique(id, vote);
   };
 
   handleNewComent = (body, author, id) => {
@@ -48,10 +46,6 @@ export class Posts extends Component {
       parentId: id
     };
     this.props.callNewComment(post);
-  };
-
-  hnadleOpenComment = () => {
-    this.props.callLoadComment();
   };
 
   orderPosts = evt => {
@@ -140,12 +134,16 @@ export class Posts extends Component {
                     <input
                       type="button"
                       value="-"
-                      onClick={() => this.handleVotingPost(post.id, "downVote")}
+                      onClick={() =>
+                        this.handleVotingPostUnique(post.id, "downVote")
+                      }
                     />
                     <input
                       type="button"
                       value="+"
-                      onClick={() => this.handleVotingPost(post.id, "upVote")}
+                      onClick={() =>
+                        this.handleVotingPostUnique(post.id, "upVote")
+                      }
                     />
                   </p>
                 </div>
@@ -191,7 +189,10 @@ export class Posts extends Component {
             <div className="br" />
           </div>
         ) : (
-          (window.location = "/NotFound")
+          //window.location = "/NotFound"
+          <div>
+            <p>Ok</p>
+          </div>
         )}
       </div>
     );
@@ -300,19 +301,15 @@ export class Posts extends Component {
   };
 
   componentDidMount() {
-    const id = new URLSearchParams(window.location.search).get("id");
-    const category = new URLSearchParams(window.location.search).get(
-      "category"
-    );
+    const id = this.props.match.params.id;
+    const category = this.props.match.params.category;
     this.setState({ category });
-
     this.props.callGetOnePostByEdit(id);
   }
 
   render() {
     let { category } = this.state;
     let filter = this.props.filter.filter;
-    let categories = this.props.categories.categories;
     let posts = this.props.posting.posting;
     return (
       <div>
@@ -348,7 +345,7 @@ export default connect(
   {
     callLoadPosting,
     callDeletePosting,
-    callVotePosting,
+    callVotePostingByUnique,
     callNewComment,
     callLoadComment,
     callLoadCategories,
@@ -359,4 +356,4 @@ export default connect(
     callDeleteComment,
     callGetOnePostByEdit
   }
-)(Posts);
+)(PostDetails);

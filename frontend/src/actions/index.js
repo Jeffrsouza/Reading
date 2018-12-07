@@ -50,6 +50,7 @@ export function votePosting(data, order) {
     order
   };
 }
+
 export function loadPostingByCat(categorie, data) {
   return {
     type: LOAD_POSTING_BY_CAT,
@@ -95,6 +96,12 @@ export function getOnePostByEdit(data) {
   return {
     type: ONE_POSTING,
     data
+  };
+}
+
+export function callVotePostingByUnique(id, vote) {
+  return dispatch => {
+    Api.votingPost(id, vote).then(response => this.callGetOnePostByEdit(id));
   };
 }
 

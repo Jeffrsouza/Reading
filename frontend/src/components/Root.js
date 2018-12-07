@@ -2,15 +2,12 @@ import React, { Component } from "react";
 import NewPost from "./NewPost";
 import PostDetails from "./PostDetails";
 import Posts from "./Posts";
-import PostsCategory from "./PostsCategory";
 import "../style/styles.css";
 import { Switch, Route } from "react-router-dom";
 import Navbar from "./NavBar";
 import NotFound from "./NotFound";
 
 export default class Root extends Component {
-  state = {};
-
   render() {
     return (
       <div className="divBorder">
@@ -53,7 +50,7 @@ export default class Root extends Component {
           />
           <Route
             exact
-            path="/:category/:post_id"
+            path="/:category/:id"
             render={props => (
               <div>
                 <div className="divPosts">

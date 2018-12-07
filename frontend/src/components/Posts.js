@@ -16,7 +16,6 @@ import {
   callDeleteComment
 } from "../actions";
 import UUID from "./UUID";
-import Navbar from "./NavBar";
 
 export class Posts extends Component {
   state = {
@@ -100,8 +99,7 @@ export class Posts extends Component {
                 <div className="textLeft">
                   <Link
                     to={{
-                      pathname: "/" + post.category + "/post_id",
-                      search: "?id=" + post.id + "&category=" + post.category
+                      pathname: "/" + post.category + "/" + post.id
                     }}
                   >
                     <input type="button" value="Details" />
@@ -301,11 +299,8 @@ export class Posts extends Component {
     );
   };
 
-  async componentDidMount() {}
   render() {
-    let category = [];
     let filter = this.props.filter.filter;
-    let categories = this.props.categories.categories;
     let posts = this.props.posts.posts;
 
     return (
