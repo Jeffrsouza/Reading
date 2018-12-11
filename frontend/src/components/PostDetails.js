@@ -7,13 +7,13 @@ import {
   callDeletePosting,
   callVotePostingByUnique,
   callLoadComment,
-  callNewComment,
+  callNewCommentPost,
   callLoadCategories,
   callFilterCategories,
   callOrderPosting,
   callEditComment,
   callVoteComment,
-  callDeleteComment,
+  callDeleteCommentPost,
   callGetOnePostByEdit
 } from "../actions";
 import UUID from "./UUID";
@@ -40,12 +40,13 @@ export class PostDetails extends Component {
     const key = UUID();
     let post = {
       id: key,
-      timestamp: new Date(),
+      timestamp: Date.now(),
       body: body,
       author: author,
       parentId: id
     };
-    this.props.callNewComment(post);
+    console.log(JSON.stringify(post));
+    this.props.callNewCommentPost(post);
   };
 
   orderPosts = evt => {
@@ -77,12 +78,12 @@ export class PostDetails extends Component {
         ? "0" + (postDate.getMonth() + 1)
         : postDate.getMonth() + 1;
     const day =
-      postDate.getDay() < 10 ? "0" + postDate.getDay() : postDate.getDay();
+      postDate.getDate() < 10 ? "0" + postDate.getDate() : postDate.getDate();
     return year + "/" + month + "/" + day;
   };
 
   handleDeleteComment = id => {
-    this.props.callDeleteComment(id);
+    this.props.callDeleteCommentPost(id);
   };
 
   listPost = post => {
@@ -346,14 +347,14 @@ export default connect(
     callLoadPosting,
     callDeletePosting,
     callVotePostingByUnique,
-    callNewComment,
+    callNewCommentPost,
     callLoadComment,
     callLoadCategories,
     callFilterCategories,
     callOrderPosting,
     callEditComment,
     callVoteComment,
-    callDeleteComment,
+    callDeleteCommentPost,
     callGetOnePostByEdit
   }
 )(PostDetails);

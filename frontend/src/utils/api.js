@@ -25,8 +25,8 @@ export const newPost = post =>
     headers: { ...headers, "Content-Type": "application/json" },
     body: JSON.stringify(post)
   })
-    .then(response => console.log(response))
-    .catch(err => console.log(err));
+    .then(response => response.json())
+    .then(response => response);
 
 export const editPost = (post, id) =>
   fetch(`${api}/posts/${id}`, {

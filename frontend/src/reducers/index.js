@@ -161,7 +161,9 @@ const initStatePosting = {
 export function posting(state = posting, action) {
   switch (action.type) {
     case ONE_POSTING:
+      console.log("ok" + action.data.voteScore);
       return { ...state, posting: action.data };
+
     default:
       return state;
   }

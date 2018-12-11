@@ -150,6 +150,15 @@ export function callNewComment(data) {
     });
   };
 }
+
+export function callNewCommentPost(data) {
+  return dispatch => {
+    Api.newComment(data).then(response => {
+      this.callGetOnePostByEdit(response.parentId);
+    });
+  };
+}
+
 export function callOpenComments(id) {
   return dispatch => openComments(id);
 }
@@ -171,9 +180,17 @@ export function editCommentId(id, data) {
     data
   };
 }
-export function callDeleteComment(id, vote) {
+export function callDeleteComment(id) {
   return dispatch => {
     Api.deleteComment(id).then(response => voteCommentId(response.id));
+  };
+}
+
+export function callDeleteCommentPost(id) {
+  return dispatch => {
+    Api.deleteComment(id).then(response =>
+      this.callGetOnePostByEdit(response.parentId)
+    );
   };
 }
 export function deleteComment(id) {

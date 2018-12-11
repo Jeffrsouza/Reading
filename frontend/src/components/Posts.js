@@ -37,7 +37,7 @@ export class Posts extends Component {
     const key = UUID();
     let post = {
       id: key,
-      timestamp: new Date(),
+      timestamp: Date.now(),
       body: body,
       author: author,
       parentId: id
